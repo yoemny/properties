@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
-Built-By: ext-ygonalm
+Built-By: yoemny
 Class-Path: lib/log4j-core-2.12.0.jar lib/log4j-api-2.12.0.jar lib/gso
  n-2.8.6.jar
-Build-Jdk: 1.8.0_181
+Build-Jdk: 1.8.0_241
 Created-By: Maven Integration for Eclipse
 Main-Class: com.pruebas.Main
 
