@@ -1,0 +1,42 @@
+{
+	"device": [{
+			"name": "desktop1"
+		},
+		{
+			"name": "desktop2"
+		},
+		{
+			"name": "android"
+		},
+		{
+			"name": "apple"
+		}
+	],
+	"driver": [{
+			"name": "chromeDriver",
+			"src": ""
+		},
+		{
+			"name": "firefoxDriver",
+			"src": ""
+		},
+		{
+			"name": "androidDriver",
+			"src": ""
+		},
+		{
+			"name": "iosDriver",
+			"src": ""
+		}
+	],
+	"environment": [{
+			"name": "prod",
+			"url": "https://www.ikea.co.id/in"
+		},
+		{
+			"name": "uat",
+			"url": "@uatserver.tw.ikeasi.com/zh/"
+		}
+	],
+	"userUAT": "twteam"
+}
