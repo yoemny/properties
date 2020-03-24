@@ -71,13 +71,111 @@ public class Main {
 */
 	
 	private static List<TestCaseData> obtenerCasos(JsonObject json, List<TestCaseData> casos) {
-		List<TestCaseData> nuevos = new ArrayList<TestCaseData>();
+		List<TestCaseData> nuevos = casos;
+		int i = 0;
     	for(String attr : json.keySet()){
-    		System.out.println(attr);
+			System.out.println("Recorriendo lista: " + attr);
+			List<TestCaseData> tmpCasos = new ArrayList<>();
+			JsonArray arrayJO = json.get(attr).getAsJsonArray();
+			
+			for (int j = 0 ; j < arrayJO.size() ; j++) {
+				JsonObject jsonObj = arrayJO.get(j).getAsJsonObject();
+				if ( i == 0) {
+					if ( j == 0 ) {
+						setTest(attr, nuevos.get(0), jsonObj);
+					}else {
+						TestCaseData test = nuevoTest(attr, nuevos.get(0), jsonObj);
+						if ( test != null ) {
+							nuevos.add(test);
+						}
+					}
+					
+				}else {
+					
+					for (TestCaseData t : nuevos) {
+						if ( j == 0 ) {
+							setTest(attr, t, jsonObj);
+						}else {
+							TestCaseData test = nuevoTest(attr, t, jsonObj);
+							if ( test != null ) {
+								tmpCasos.add(test);
+							}
+							
+						}
+					}
+				}
+			}
+			i++;
+			nuevos.addAll(tmpCasos);
+			System.out.println("Count lista: " + nuevos.size());
     	}		        	
 		return nuevos;
 	}
 
+	private static TestCaseData nuevoTest(String attr, TestCaseData test, JsonObject jsonObj) {
+		TestCaseData nuevo = null;
+
+		nuevo = test.clone();
+		nuevo = setTest(attr, nuevo, jsonObj);
+		
+		return nuevo;
+	}
+
+	private static TestCaseData setTest(String attr, TestCaseData test, JsonObject jsonObj) {
+		for(String attrJson : jsonObj.keySet()){
+			String valor = jsonObj.get(attrJson).getAsString();
+			test = setObject(attr+capitalize(attrJson), test, valor);
+		}
+		return test;
+	}
+	
+	private static Boolean tieneValores(String attr, TestCaseData test, JsonObject jsonObj) {
+		Boolean tiene = true;
+		Iterator<String> nombresAttr = jsonObj.keySet().iterator(); 
+		while ( tiene && nombresAttr.hasNext() ) {
+			String nombreAttr = nombresAttr.next();
+			try {
+				Method method = test.getClass().getMethod("get"+capitalize(attr)+capitalize(nombreAttr));
+				String valor = (String)method.invoke(test);
+				if ( valor == null )
+					tiene = false;
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		
+		return tiene;
+	}
+
+	private static TestCaseData setObject(String attr, TestCaseData test, String valor) {
+		try {
+			Method method = test.getClass().getMethod("set"+capitalize(attr), String.class);
+			method.invoke(test, valor);
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		
+		return test;
+	}
+	
+	
 	private static Boolean todosLista(JsonObject json) {
 		Boolean result = true;
         if(json.isJsonObject()) {
@@ -106,6 +204,7 @@ public class Main {
     				String value = json.get(attr).getAsString(); 
 					Method method = root.getClass().getMethod("set"+capitalize(attr), String.class);
 					method.invoke(root, value);
+					//root.setUserUAT(value);
 				} catch (NoSuchMethodException e) {
 					e.printStackTrace();
 				} catch (SecurityException e) {
@@ -162,6 +261,14 @@ public class Main {
 		        	}else {
 		        		casos = obtenerCasos(json, casos);
 		        	}
+		        	
+		        	System.out.println("Count: " + casos.size());
+		        	Integer index = 1;
+		        	for (TestCaseData testCaseData : casos) {
+						System.out.println(index + " - " + testCaseData.toString());
+						index++;
+					}
+		        	
 		        	/*
 					 JsonArray driver = json.get("driver").getAsJsonArray();
 					 if ( driver != null && driver.isJsonArray() ) {
